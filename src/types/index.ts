@@ -1,11 +1,12 @@
-export type UserRole = 'student' | 'teacher' | 'admin';
+export type UserRole = 'STUDENT' | 'TEACHER' | 'ADMIN';
 
 export interface User {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   role: UserRole;
-  avatar?: string;
+  avatarUrl?: string;
 }
 
 export interface Course {
@@ -32,12 +33,17 @@ export interface Lesson {
   isCompleted?: boolean;
 }
 
-export interface Badge {
+export interface Achievement {
   id: string;
   name: string;
   description: string;
-  icon: string;
+  icon?: string;
+  points: number;
   earnedAt?: string;
+}
+
+export interface AchievementPayload extends Achievement {
+  id: string;
 }
 
 export interface LeaderboardEntry {
@@ -45,7 +51,7 @@ export interface LeaderboardEntry {
   studentId: string;
   studentName: string;
   points: number;
-  avatar: string;
+  avatarUrl: string;
 }
 
 export interface LearningStep {
@@ -60,7 +66,7 @@ export interface LearningStep {
 export interface StudentProfile extends User {
   points: number;
   level: number;
-  badges: Badge[];
+  achievements: Achievement[];
   learningPath: LearningStep[];
 }
 

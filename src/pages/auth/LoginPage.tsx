@@ -1,28 +1,36 @@
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle } from 'lucide-react';
+import { useAuth } from '@/hooks/use-auth';
+import { toast } from 'sonner';
 
 export function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { login, user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = (e: FormEvent) => {
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const rolePath = user.role.toLowerCase();
+      navigate(`/dashboard/${rolePath}`);
+    }
+  }, [isAuthenticated, user, navigate]);
+
+  const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
-    // Simulate login logic
-    if (email.includes('student')) {
-      navigate('/dashboard/student');
-    } else if (email.includes('teacher')) {
-      navigate('/dashboard/teacher');
-    } else if (email.includes('admin')) {
-      navigate('/dashboard/admin');
-    } else {
-      // Default to student for demo
-      navigate('/dashboard/student');
+    setIsSubmitting(true);
+    
+    try {
+      await login(email, password);
+      toast.success('Signed in successfully');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to sign in');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -41,37 +49,41 @@ export function LoginPage() {
             </p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium">Email</label>
-              <Input 
-                id="email" 
-                type="email" 
-                placeholder="m@example.com" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required 
-                className="h-11"
-              />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label htmlFor="password" className="text-sm font-medium">Password</label>
-                <Link to="/forgot-password" className="text-sm font-medium text-primary hover:underline">
-                  Forgot password?
-                </Link>
-              </div>
-              <Input 
-                id="password" 
-                type="password" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required 
-                className="h-11"
-              />
-            </div>
-            <Button type="submit" className="w-full h-11 text-base">Sign In</Button>
-          </form>
+      <form onSubmit={handleLogin} className="space-y-6">
+        <div className="space-y-2">
+          <label htmlFor="email" className="text-sm font-medium">Email</label>
+          <Input 
+            id="email" 
+            type="email" 
+            placeholder="m@example.com" 
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required 
+            disabled={isSubmitting}
+            className="h-11"
+          />
+        </div>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <label htmlFor="password" className="text-sm font-medium">Password</label>
+            <Link to="/forgot-password" disabled={isSubmitting} className="text-sm font-medium text-primary hover:underline">
+              Forgot password?
+            </Link>
+          </div>
+          <Input 
+            id="password" 
+            type="password" 
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required 
+            disabled={isSubmitting}
+            className="h-11"
+          />
+        </div>
+        <Button type="submit" className="w-full h-11 text-base" disabled={isSubmitting}>
+          {isSubmitting ? 'Signing in...' : 'Sign In'}
+        </Button>
+      </form>
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">

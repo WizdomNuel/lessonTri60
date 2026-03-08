@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -40,8 +40,13 @@ const LEARNING_STYLES = [
   { value: 'kinesthetic', label: 'Kinesthetic (Hands-on, Practice)' },
 ];
 
+import { useAuth } from '@/hooks/use-auth';
+import { toast } from 'sonner';
+
 export function RegisterPage() {
   const navigate = useNavigate();
+  const { register, isAuthenticated, user } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     // Step 1: Personal
@@ -49,7 +54,7 @@ export function RegisterPage() {
     lastName: '',
     email: '',
     password: '',
-    role: 'student' as UserRole,
+    role: 'STUDENT' as UserRole,
     // Step 2: Academic (Student)
     gradeLevel: '',
     schoolName: '',
@@ -69,7 +74,14 @@ export function RegisterPage() {
     availability: '',
   });
 
-  const STEPS = formData.role === 'student' ? STUDENT_STEPS : TEACHER_STEPS;
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const rolePath = user.role.toLowerCase();
+      navigate(`/dashboard/${rolePath}`);
+    }
+  }, [isAuthenticated, user, navigate]);
+
+  const STEPS = formData.role === 'STUDENT' ? STUDENT_STEPS : TEACHER_STEPS;
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -77,7 +89,7 @@ export function RegisterPage() {
 
   const handleSubjectToggle = (subject: string, field: 'subjectsToImprove' | 'subjectsTaught' = 'subjectsToImprove') => {
     setFormData(prev => {
-      const current = prev[field];
+      const current = prev[field] as string[];
       return {
         ...prev,
         [field]: current.includes(subject)
@@ -101,11 +113,16 @@ export function RegisterPage() {
     }
   };
 
-  const handleSubmit = () => {
-    // Simulate registration logic
-    console.log('Registration Data:', formData);
-    // In a real app, you would send this to your backend
-    navigate('/login');
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      await register(formData);
+      toast.success('Account created successfully!');
+    } catch (error: any) {
+      toast.error(error.message || 'Registration failed');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Animation variants
@@ -234,15 +251,15 @@ export function RegisterPage() {
                     <Label>I am a:</Label>
                     <div className="grid grid-cols-2 gap-4">
                       <div 
-                        onClick={() => handleInputChange('role', 'student')}
-                        className={`cursor-pointer border rounded-lg p-4 flex flex-col items-center gap-2 transition-all ${formData.role === 'student' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'hover:bg-muted/50'}`}
+                        onClick={() => handleInputChange('role', 'STUDENT')}
+                        className={`cursor-pointer border rounded-lg p-4 flex flex-col items-center gap-2 transition-all ${formData.role === 'STUDENT' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'hover:bg-muted/50'}`}
                       >
                         <User className="w-6 h-6" />
                         <span className="font-medium">Student</span>
                       </div>
                       <div 
-                        onClick={() => handleInputChange('role', 'teacher')}
-                        className={`cursor-pointer border rounded-lg p-4 flex flex-col items-center gap-2 transition-all ${formData.role === 'teacher' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'hover:bg-muted/50'}`}
+                        onClick={() => handleInputChange('role', 'TEACHER')}
+                        className={`cursor-pointer border rounded-lg p-4 flex flex-col items-center gap-2 transition-all ${formData.role === 'TEACHER' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'hover:bg-muted/50'}`}
                       >
                         <BookOpen className="w-6 h-6" />
                         <span className="font-medium">Teacher</span>
@@ -253,7 +270,7 @@ export function RegisterPage() {
               )}
 
               {/* STEP 2: ACADEMIC INFO (STUDENT) */}
-              {currentStep === 2 && formData.role === 'student' && (
+              {currentStep === 2 && formData.role === 'STUDENT' && (
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="gradeLevel">Current Class / Grade Level</Label>
@@ -308,7 +325,7 @@ export function RegisterPage() {
               )}
 
               {/* STEP 2: PROFESSIONAL INFO (TEACHER) */}
-              {currentStep === 2 && formData.role === 'teacher' && (
+              {currentStep === 2 && formData.role === 'TEACHER' && (
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="qualification">Highest Qualification</Label>
@@ -361,7 +378,7 @@ export function RegisterPage() {
               )}
 
               {/* STEP 3: INTERESTS & GOALS (STUDENT) */}
-              {currentStep === 3 && formData.role === 'student' && (
+              {currentStep === 3 && formData.role === 'STUDENT' && (
                 <div className="space-y-6">
                   <div className="space-y-3">
                     <Label>Subjects you want to improve on</Label>
@@ -435,7 +452,7 @@ export function RegisterPage() {
               )}
 
               {/* STEP 3: TEACHING PROFILE (TEACHER) */}
-              {currentStep === 3 && formData.role === 'teacher' && (
+              {currentStep === 3 && formData.role === 'TEACHER' && (
                 <div className="space-y-6">
                   <div className="space-y-3">
                     <Label>Subjects you can teach</Label>
@@ -493,10 +510,10 @@ export function RegisterPage() {
                       </div>
                       <div>
                         <span className="text-muted-foreground block">Role</span>
-                        <span className="font-medium capitalize">{formData.role}</span>
+                        <span className="font-medium capitalize">{formData.role.toLowerCase()}</span>
                       </div>
                       
-                      {formData.role === 'student' ? (
+                      {formData.role === 'STUDENT' ? (
                         <>
                           <div>
                             <span className="text-muted-foreground block">Class</span>
@@ -523,11 +540,11 @@ export function RegisterPage() {
                     
                     <div className="pt-4 border-t">
                       <span className="text-muted-foreground block text-sm mb-2">
-                        {formData.role === 'student' ? 'Focus Subjects' : 'Subjects Taught'}
+                        {formData.role === 'STUDENT' ? 'Focus Subjects' : 'Subjects Taught'}
                       </span>
                       <div className="flex flex-wrap gap-2">
-                        {(formData.role === 'student' ? formData.subjectsToImprove : formData.subjectsTaught).length > 0 ? (
-                          (formData.role === 'student' ? formData.subjectsToImprove : formData.subjectsTaught).map(s => (
+                        {(formData.role === 'STUDENT' ? formData.subjectsToImprove : formData.subjectsTaught).length > 0 ? (
+                          (formData.role === 'STUDENT' ? formData.subjectsToImprove : formData.subjectsTaught).map(s => (
                             <span key={s} className="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full">
                               {s}
                             </span>
@@ -538,7 +555,7 @@ export function RegisterPage() {
                       </div>
                     </div>
 
-                    {formData.role === 'student' && (
+                    {formData.role === 'STUDENT' && (
                       <div className="pt-4 border-t grid grid-cols-2 gap-4">
                         <div>
                           <span className="text-muted-foreground block text-sm mb-1">Primary Goal</span>
@@ -555,7 +572,7 @@ export function RegisterPage() {
                       </div>
                     )}
 
-                    {formData.role === 'teacher' && (
+                    {formData.role === 'TEACHER' && (
                       <div className="pt-4 border-t">
                         <span className="text-muted-foreground block text-sm mb-1">Bio</span>
                         <p className="text-sm text-muted-foreground line-clamp-3">
@@ -583,7 +600,7 @@ export function RegisterPage() {
           <Button 
             variant="outline" 
             onClick={handleBack}
-            disabled={currentStep === 1}
+            disabled={currentStep === 1 || isSubmitting}
             className="w-24"
           >
             <ChevronLeft className="w-4 h-4 mr-2" />
@@ -599,9 +616,10 @@ export function RegisterPage() {
             <Button 
               onClick={handleNext}
               className="w-32"
+              disabled={isSubmitting}
             >
-              {currentStep === STEPS.length ? 'Complete' : 'Next'}
-              {currentStep !== STEPS.length && <ChevronRight className="w-4 h-4 ml-2" />}
+              {isSubmitting ? 'Processing...' : currentStep === STEPS.length ? 'Complete' : 'Next'}
+              {!isSubmitting && currentStep !== STEPS.length && <ChevronRight className="w-4 h-4 ml-2" />}
             </Button>
           </div>
         </CardFooter>

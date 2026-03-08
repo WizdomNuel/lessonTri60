@@ -1,4 +1,4 @@
-import { Course, TeacherProfile, User, Badge, LeaderboardEntry, LearningStep } from '@/types';
+import { Course, TeacherProfile, User, Achievement, LeaderboardEntry, LearningStep } from '@/types';
 
 export const MOCK_COURSES: Course[] = [
   {
@@ -80,12 +80,13 @@ export const MOCK_TEACHERS: TeacherProfile[] = [
   },
 ];
 
-export const MOCK_BADGES: Badge[] = [
+export const MOCK_BADGES: Achievement[] = [
   {
     id: 'b1',
     name: 'Fast Starter',
     description: 'Completed first lesson within 24 hours',
     icon: '🚀',
+    points: 100,
     earnedAt: '2023-09-01',
   },
   {
@@ -93,6 +94,7 @@ export const MOCK_BADGES: Badge[] = [
     name: 'Quiz Master',
     description: 'Scored 100% on 3 quizzes in a row',
     icon: '🎯',
+    points: 500,
     earnedAt: '2023-09-15',
   },
   {
@@ -100,21 +102,23 @@ export const MOCK_BADGES: Badge[] = [
     name: 'Bookworm',
     description: 'Completed 10 reading assignments',
     icon: '📚',
+    points: 200,
   },
   {
     id: 'b4',
     name: 'Course Completer',
     description: 'Finished the Mathematics for SS3 course',
     icon: '🏆',
+    points: 1000,
   },
 ];
 
 export const MOCK_LEADERBOARD: LeaderboardEntry[] = [
-  { rank: 1, studentId: 's1', studentName: 'Emeka Obi', points: 12500, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emeka' },
-  { rank: 2, studentId: 's2', studentName: 'Aisha Bello', points: 11200, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Aisha' },
-  { rank: 3, studentId: 's3', studentName: 'Tunde Bakare', points: 10800, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Tunde' },
-  { rank: 4, studentId: 'u1', studentName: 'Chioma Nwosu', points: 9500, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Chioma' }, // Current User
-  { rank: 5, studentId: 's5', studentName: 'Ngozi Eze', points: 9100, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ngozi' },
+  { rank: 1, studentId: 's1', studentName: 'Emeka Obi', points: 12500, avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emeka' },
+  { rank: 2, studentId: 's2', studentName: 'Aisha Bello', points: 11200, avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Aisha' },
+  { rank: 3, studentId: 's3', studentName: 'Tunde Bakare', points: 10800, avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Tunde' },
+  { rank: 4, studentId: 'u1', studentName: 'Chioma Nwosu', points: 9500, avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Chioma' }, // Current User
+  { rank: 5, studentId: 's5', studentName: 'Ngozi Eze', points: 9100, avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ngozi' },
 ];
 
 export const MOCK_LEARNING_PATH: LearningStep[] = [

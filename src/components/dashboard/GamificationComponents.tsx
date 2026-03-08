@@ -2,9 +2,10 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Trophy, Star, Medal, Crown } from 'lucide-react';
-import { MOCK_BADGES, MOCK_LEADERBOARD } from '@/lib/mockData';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
+import { Achievement, LeaderboardEntry } from '@/types';
+import { useAuth } from '@/hooks/use-auth';
 
 export function PointsCounter({ points }: { points: number }) {
   return (
@@ -30,7 +31,7 @@ export function PointsCounter({ points }: { points: number }) {
   );
 }
 
-export function BadgeList() {
+export function BadgeList({ achievements = [] }: { achievements?: Achievement[] }) {
   return (
     <div className="glass-panel rounded-2xl overflow-hidden">
       <div className="p-6 border-b border-border/50">
@@ -41,7 +42,7 @@ export function BadgeList() {
       </div>
       <div className="p-6">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {MOCK_BADGES.map((badge, index) => (
+          {achievements.length > 0 ? achievements.map((badge, index) => (
             <motion.div
               key={badge.id}
               initial={{ opacity: 0, y: 20 }}
@@ -54,7 +55,7 @@ export function BadgeList() {
                   : "bg-muted/30 border-transparent opacity-60 grayscale hover:opacity-80"
               )}
             >
-              <div className="text-4xl mb-3 drop-shadow-md">{badge.icon}</div>
+              <div className="text-4xl mb-3 drop-shadow-md">{badge.icon || '🏆'}</div>
               <div className="font-bold text-sm line-clamp-1">{badge.name}</div>
               <div className="text-xs text-muted-foreground line-clamp-2 mt-1">{badge.description}</div>
               {badge.earnedAt && (
@@ -63,14 +64,20 @@ export function BadgeList() {
                 </Badge>
               )}
             </motion.div>
-          ))}
+          )) : (
+            <div className="col-span-full py-8 text-center text-muted-foreground italic">
+              Keep learning to unlock achievements!
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-export function Leaderboard() {
+export function Leaderboard({ entries = [] }: { entries?: LeaderboardEntry[] }) {
+  const { user } = useAuth();
+  
   return (
     <div className="glass-panel rounded-2xl overflow-hidden">
       <div className="p-6 border-b border-border/50">
@@ -80,7 +87,7 @@ export function Leaderboard() {
         </h3>
       </div>
       <div className="divide-y divide-border/50">
-        {MOCK_LEADERBOARD.map((entry, index) => (
+        {entries.length > 0 ? entries.map((entry, index) => (
           <motion.div
             key={entry.studentId}
             initial={{ opacity: 0, x: -20 }}
@@ -88,7 +95,7 @@ export function Leaderboard() {
             transition={{ delay: index * 0.1 }}
             className={cn(
               "flex items-center gap-4 p-4 hover:bg-primary/5 transition-colors duration-300",
-              entry.studentId === 'u1' && "bg-primary/5 border-l-2 border-primary"
+              entry.studentId === user?.id && "bg-primary/5 border-l-2 border-primary"
             )}
           >
             <div className={cn(
@@ -98,23 +105,27 @@ export function Leaderboard() {
               index === 2 ? "bg-orange-100 text-orange-700 ring-2 ring-orange-200" :
               "text-muted-foreground bg-muted"
             )}>
-              {index < 3 ? <Crown className="h-4 w-4" /> : entry.rank}
+              {index < 3 ? <Crown className="h-4 w-4" /> : index + 1}
             </div>
             
             <Avatar className="h-10 w-10 border-2 border-background ring-2 ring-border/50">
-              <AvatarImage src={entry.avatar} />
+              <AvatarImage src={entry.avatarUrl} />
               <AvatarFallback>{entry.studentName[0]}</AvatarFallback>
             </Avatar>
             
             <div className="flex-1 min-w-0">
               <div className="font-medium truncate flex items-center gap-2">
                 {entry.studentName}
-                {entry.studentId === 'u1' && <Badge variant="outline" className="text-[10px] h-5 border-primary/30 text-primary">You</Badge>}
+                {entry.studentId === user?.id && <Badge variant="outline" className="text-[10px] h-5 border-primary/30 text-primary">You</Badge>}
               </div>
               <div className="text-xs text-muted-foreground font-mono">{entry.points.toLocaleString()} pts</div>
             </div>
           </motion.div>
-        ))}
+        )) : (
+          <div className="p-8 text-center text-muted-foreground italic">
+            Leaderboard is being updated...
+          </div>
+        )}
       </div>
     </div>
   );

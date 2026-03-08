@@ -1,15 +1,66 @@
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MOCK_COURSES } from '@/lib/mockData';
-import { BookOpen, Clock, Video, FileText, ArrowRight, Zap, Trophy, Target, Activity } from 'lucide-react';
+import { BookOpen, Clock, Video, FileText, ArrowRight, Zap, Trophy, Target, Activity, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PointsCounter, BadgeList, Leaderboard } from '@/components/dashboard/GamificationComponents';
 import { LearningPath } from '@/components/dashboard/LearningPath';
+import { api } from '@/lib/api-client';
+import { toast } from 'sonner';
 
 export function StudentDashboard() {
-  const enrolledCourses = MOCK_COURSES.slice(0, 2); // Mock enrolled courses
-  const studentPoints = 9500; // Mock points
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<{
+    profile: any;
+    courses: any[];
+    leaderboard: any[];
+    schedule: any[];
+  }>({
+    profile: null,
+    courses: [],
+    leaderboard: [],
+    schedule: []
+  });
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        // We'll fetch multiple things here
+        // For now, let's fetch profile as a starting point
+        const [profileRes, coursesRes, leaderboardRes] = await Promise.all([
+          api.get('/users/profile'),
+          api.get('/courses/enrolled'),
+          api.get('/gamification/leaderboard')
+        ]) as [any, any, any];
+
+        setData({
+          profile: profileRes.data,
+          courses: coursesRes.data || [],
+          leaderboard: leaderboardRes.data || [],
+          schedule: [] // We'll add this later or mock for now
+        });
+      } catch (error: any) {
+        toast.error('Failed to load dashboard data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex h-[80vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  const { profile, courses, leaderboard } = data;
+  const studentPoints = profile?.points || 0;
 
   return (
     <div className="space-y-8">
@@ -24,9 +75,9 @@ export function StudentDashboard() {
           <div className="relative z-10">
             <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Active Courses</p>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-4xl font-bold text-foreground">4</span>
+              <span className="text-4xl font-bold text-foreground">{courses.length}</span>
               <span className="text-xs font-medium text-primary flex items-center bg-primary/10 px-2 py-0.5 rounded-full">
-                <Activity className="h-3 w-3 mr-1" /> +1
+                <Activity className="h-3 w-3 mr-1" /> Current
               </span>
             </div>
             <div className="mt-4 h-1 w-full bg-muted rounded-full overflow-hidden">
@@ -40,11 +91,11 @@ export function StudentDashboard() {
             <Clock className="h-24 w-24 text-primary" />
           </div>
           <div className="relative z-10">
-            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Learning Hours</p>
+            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Level</p>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-4xl font-bold text-foreground">12.5</span>
+              <span className="text-4xl font-bold text-foreground">{profile?.level || 1}</span>
               <span className="text-xs font-medium text-primary flex items-center bg-primary/10 px-2 py-0.5 rounded-full">
-                <Target className="h-3 w-3 mr-1" /> +2.5h
+                <Target className="h-3 w-3 mr-1" /> Rank
               </span>
             </div>
             <div className="mt-4 h-1 w-full bg-muted rounded-full overflow-hidden">
@@ -85,12 +136,12 @@ export function StudentDashboard() {
                 <Zap className="h-5 w-5 text-primary" />
                 <span className="tracking-tight">Continue Learning</span>
               </h3>
-              <Button variant="ghost" size="sm" className="text-primary hover:text-primary hover:bg-primary/10">
-                View All <ArrowRight className="ml-1 h-4 w-4" />
+              <Button variant="ghost" size="sm" asChild className="text-primary hover:text-primary hover:bg-primary/10">
+                <Link to="/courses">View All <ArrowRight className="ml-1 h-4 w-4" /></Link>
               </Button>
             </div>
             <div className="divide-y divide-border/50">
-              {enrolledCourses.map((course) => (
+              {courses.length > 0 ? courses.map((course) => (
                 <div key={course.id} className="group p-4 flex items-center gap-4 hover:bg-primary/5 transition-colors duration-300">
                   <div className="h-24 w-36 rounded-xl bg-muted overflow-hidden shrink-0 relative shadow-sm group-hover:shadow-md transition-all">
                     <img 
@@ -117,7 +168,7 @@ export function StudentDashboard() {
                     
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
-                        <span>Lesson 5 of {course.lessonsCount}</span>
+                        <span>Progress</span>
                         <span className="text-primary">45%</span>
                       </div>
                       <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
@@ -125,23 +176,32 @@ export function StudentDashboard() {
                       </div>
                     </div>
                   </div>
-                  <Button size="sm" className="rounded-full px-4 sm:px-6 bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20 shrink-0">
-                    <span className="hidden sm:inline">Resume</span>
-                    <Zap className="sm:ml-2 h-4 w-4" />
+                  <Button asChild size="sm" className="rounded-full px-4 sm:px-6 bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20 shrink-0">
+                    <Link to={`/courses/${course.id}`}>
+                      <span className="hidden sm:inline">Resume</span>
+                      <Zap className="sm:ml-2 h-4 w-4" />
+                    </Link>
                   </Button>
                 </div>
-              ))}
+              )) : (
+                <div className="p-8 text-center space-y-4">
+                  <p className="text-muted-foreground">You haven't enrolled in any courses yet.</p>
+                  <Button asChild>
+                    <Link to="/courses">Browse Courses</Link>
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
           
           {/* Badges */}
-          <BadgeList />
+          <BadgeList achievements={profile?.achievements} />
         </div>
 
         {/* Sidebar Column */}
         <div className="space-y-8">
           {/* Leaderboard */}
-          <Leaderboard />
+          <Leaderboard entries={leaderboard} />
 
           {/* Upcoming Schedule */}
           <div className="glass-panel rounded-2xl overflow-hidden">
@@ -152,32 +212,23 @@ export function StudentDashboard() {
               </h3>
             </div>
             <div className="p-4 space-y-3">
-              {[
-                { title: 'Math Live Class', time: '10:00 AM', date: 'Today', type: 'Live' },
-                { title: 'Physics Quiz', time: '2:00 PM', date: 'Today', type: 'Quiz' },
-                { title: 'English Essay', time: '11:59 PM', date: 'Tomorrow', type: 'Assignment' },
-              ].map((item, i) => (
+              {[].length > 0 ? [].map((item, i) => (
                 <div key={i} className="group flex items-center justify-between p-3 rounded-xl border border-border/50 bg-card/50 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300">
                   <div className="flex items-center gap-3">
-                    <div className={`h-10 w-10 rounded-full flex items-center justify-center ${
-                      item.type === 'Live' 
-                        ? 'bg-red-500/10 text-red-500' 
-                        : 'bg-blue-500/10 text-blue-500'
-                    }`}>
-                      {item.type === 'Live' ? <Video className="h-5 w-5" /> : <FileText className="h-5 w-5" />}
+                    <div className="h-10 w-10 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center">
+                      <Video className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="font-semibold text-sm group-hover:text-primary transition-colors">{item.title}</p>
-                      <p className="text-xs text-muted-foreground font-medium">{item.date} • {item.time}</p>
+                      <p className="font-semibold text-sm group-hover:text-primary transition-colors">Live Class</p>
+                      <p className="text-xs text-muted-foreground font-medium">Starting soon</p>
                     </div>
                   </div>
-                  {item.type === 'Live' && (
-                    <Button size="sm" variant="outline" className="rounded-full border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground h-8 px-4">
-                      Join
-                    </Button>
-                  )}
                 </div>
-              ))}
+              )) : (
+                 <div className="p-4 text-center text-sm text-muted-foreground italic">
+                   No sessions scheduled for today.
+                 </div>
+              )}
             </div>
           </div>
         </div>

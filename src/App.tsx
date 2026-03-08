@@ -26,6 +26,7 @@ import { AdminCourses } from '@/pages/dashboard/admin/AdminCourses';
 import { ContactPage } from '@/pages/public/ContactPage';
 import { Toaster } from 'sonner';
 import { ThemeProvider } from '@/components/theme-provider';
+import { AuthProvider } from '@/hooks/use-auth';
 import { AnimatePresence } from 'framer-motion';
 import { PageTransition } from '@/components/layout/PageTransition';
 
@@ -34,8 +35,7 @@ function AnimatedRoutes() {
 
   return (
     <AnimatePresence mode="wait">
-      {/* @ts-expect-error React Router types don't officially support key but React itself uses it for AnimatePresence */}
-      <Routes location={location} key={location.pathname}>
+      <Routes location={location}>
         {/* Public Routes */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<PageTransition><HomePage /></PageTransition>} />
@@ -51,7 +51,7 @@ function AnimatedRoutes() {
         <Route path="/register" element={<PageTransition><RegisterPage /></PageTransition>} />
 
         {/* Student Dashboard */}
-        <Route path="/dashboard/student" element={<DashboardLayout role="student" />}>
+        <Route path="/dashboard/student" element={<DashboardLayout role="STUDENT" />}>
           <Route index element={<PageTransition><StudentDashboard /></PageTransition>} />
           <Route path="courses" element={<PageTransition><StudentCourses /></PageTransition>} />
           <Route path="live-classes" element={<PageTransition><StudentLiveClasses /></PageTransition>} />
@@ -60,7 +60,7 @@ function AnimatedRoutes() {
         </Route>
 
         {/* Teacher Dashboard */}
-        <Route path="/dashboard/teacher" element={<DashboardLayout role="teacher" />}>
+        <Route path="/dashboard/teacher" element={<DashboardLayout role="TEACHER" />}>
           <Route index element={<PageTransition><TeacherDashboard /></PageTransition>} />
           <Route path="courses" element={<PageTransition><TeacherCourses /></PageTransition>} />
           <Route path="analytics" element={<PageTransition><TeacherAnalytics /></PageTransition>} />
@@ -68,7 +68,7 @@ function AnimatedRoutes() {
         </Route>
 
         {/* Admin Dashboard */}
-        <Route path="/dashboard/admin" element={<DashboardLayout role="admin" />}>
+        <Route path="/dashboard/admin" element={<DashboardLayout role="ADMIN" />}>
           <Route index element={<PageTransition><AdminDashboard /></PageTransition>} />
           <Route path="teachers" element={<PageTransition><AdminTeachers /></PageTransition>} />
           <Route path="courses" element={<PageTransition><AdminCourses /></PageTransition>} />
@@ -85,10 +85,12 @@ function AnimatedRoutes() {
 export default function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <BrowserRouter>
-        <Toaster position="top-center" richColors />
-        <AnimatedRoutes />
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <Toaster position="top-center" richColors />
+          <AnimatedRoutes />
+        </BrowserRouter>
+      </AuthProvider>
     </ThemeProvider>
   );
 }
