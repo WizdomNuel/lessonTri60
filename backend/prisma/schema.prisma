@@ -5,7 +5,9 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  engineType    = "library"
+  binaryTargets = ["native", "windows"]
 }
 
 datasource db {
@@ -19,28 +21,53 @@ enum Role {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  firstName String
-  lastName  String
-  role      Role     @default(STUDENT)
-  avatarUrl String?
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String   @id @default(uuid())
+  email           String   @unique
+  password        String
+  full_name       String
+  role            Role     @default(STUDENT)
+  phase_completed Int      @default(0)
+  profile_photo   String?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   // Gamification fields
   totalPoints Int @default(0)
   level       Int @default(1)
 
-  coursesCreated Course[]     @relation("TeacherCourses")
+  coursesCreated Course[]           @relation("TeacherCourses")
   enrollments    Enrollment[]
   payments       Payment[]
   submissions    Submission[]
   achievements   Achievement[]
   pointHistory   PointTransaction[]
   liveClasses    LiveClass[]        @relation("LiveClassTeacher")
+
+  // Phase 2: Academic information
+  // For students:
+  class_level              String? // Nursery – SS3
+  school_type              String? // Public / Private
+  preferred_learning_style String?
+  learning_goals           String?
+
+  // For teachers:
+  subjects            String[]
+  qualification       String?
+  years_of_experience String?
+  teaching_method     String?
+
+  // Phase 3: Interests and personalization
+  subjects_of_interest     String[]
+  skills_to_improve        String[]
+  challenge_level          String?
+  notification_preferences Json?
+
+  // Phase 4: Profile enhancement
+  bio            String?
+  social_links   Json?
+  certificate_upload String?
+  cv_upload          String?
 }
 
 model Achievement {

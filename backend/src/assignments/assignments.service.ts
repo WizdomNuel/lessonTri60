@@ -77,8 +77,7 @@ export class AssignmentsService {
         student: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
+            full_name: true,
           },
         },
       },

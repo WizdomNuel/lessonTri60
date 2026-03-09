@@ -21,8 +21,8 @@ export class LiveClassesService {
       include: {
         teacher: {
           select: {
-            firstName: true,
-            lastName: true,
+            id: true,
+            full_name: true,
           },
         },
       },

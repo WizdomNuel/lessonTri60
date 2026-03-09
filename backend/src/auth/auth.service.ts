@@ -27,15 +27,41 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        full_name: user.full_name,
         role: user.role,
       },
     };
   }
 
-  async register(userData: any) {
-    const user = await this.usersService.create(userData);
+  async registerPhase1(dto: any) {
+    const user = await this.usersService.create({
+      ...dto,
+      phase_completed: 1,
+    });
     return this.login(user);
+  }
+
+  async registerPhase2(userId: string, dto: any) {
+    const user = await this.usersService.update(userId, {
+      ...dto,
+      phase_completed: 2,
+    });
+    return user;
+  }
+
+  async registerPhase3(userId: string, dto: any) {
+    const user = await this.usersService.update(userId, {
+      ...dto,
+      phase_completed: 3,
+    });
+    return user;
+  }
+
+  async registerPhase4(userId: string, dto: any) {
+    const user = await this.usersService.update(userId, {
+      ...dto,
+      phase_completed: 4,
+    });
+    return user;
   }
 }

@@ -88,11 +88,10 @@ export class GamificationService {
       take: 10,
       orderBy: { totalPoints: 'desc' },
       select: {
-        firstName: true,
-        lastName: true,
+        full_name: true,
         totalPoints: true,
         level: true,
-        avatarUrl: true,
+        profile_photo: true,
       },
     });
   }

@@ -14,9 +14,8 @@ export class CoursesService {
         teacher: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
-            avatarUrl: true,
+            full_name: true,
+            profile_photo: true,
           },
         },
       },
@@ -30,8 +29,7 @@ export class CoursesService {
         teacher: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
+            full_name: true,
           },
         },
         modules: {

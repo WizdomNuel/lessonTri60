@@ -30,8 +30,7 @@ export class AdminService {
       select: {
         id: true,
         email: true,
-        firstName: true,
-        lastName: true,
+        full_name: true,
         role: true,
         isActive: true,
         createdAt: true,
