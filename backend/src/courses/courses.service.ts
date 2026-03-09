@@ -22,6 +22,29 @@ export class CoursesService {
     });
   }
 
+  async findEnrolled(userId: string) {
+    const enrollments = await this.prisma.enrollment.findMany({
+      where: { userId },
+      include: {
+        course: {
+          include: {
+            teacher: {
+              select: {
+                id: true,
+                full_name: true,
+                profile_photo: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    return enrollments.map((e) => ({
+      ...e.course,
+      progress: e.progress,
+    }));
+  }
+
   async findOne(id: string) {
     const course = await this.prisma.course.findUnique({
       where: { id },

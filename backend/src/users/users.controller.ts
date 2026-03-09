@@ -15,6 +15,11 @@ export class UsersController {
     return this.usersService.findById(user.id);
   }
 
+  @Get('profile')
+  getProfileAlias(@CurrentUser() user: any) {
+    return this.usersService.findById(user.id);
+  }
+
   @Get(':id')
   @Roles('ADMIN')
   getUserById(@Param('id') id: string) {

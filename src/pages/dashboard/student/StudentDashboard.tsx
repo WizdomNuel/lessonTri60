@@ -36,9 +36,9 @@ export function StudentDashboard() {
         ]) as [any, any, any];
 
         setData({
-          profile: profileRes.data,
-          courses: coursesRes.data || [],
-          leaderboard: leaderboardRes.data || [],
+          profile: profileRes,
+          courses: coursesRes || [],
+          leaderboard: leaderboardRes || [],
           schedule: [] // We'll add this later or mock for now
         });
       } catch (error: any) {

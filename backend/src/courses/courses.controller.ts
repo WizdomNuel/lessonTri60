@@ -26,6 +26,13 @@ export class CoursesController {
     return { data: courses };
   }
 
+  @Get('enrolled')
+  @UseGuards(JwtAuthGuard)
+  async findEnrolled(@CurrentUser() user: any) {
+    const courses = await this.coursesService.findEnrolled(user.id);
+    return { data: courses };
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const course = await this.coursesService.findOne(id);
