@@ -80,19 +80,32 @@ export class GamificationService {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
-    return user;
+    return {
+      ...user,
+      points: user.totalPoints,
+    };
   }
 
   async getLeaderboard() {
-    return this.prisma.user.findMany({
+    const users = await this.prisma.user.findMany({
       take: 10,
       orderBy: { totalPoints: 'desc' },
       select: {
+        id: true,
         full_name: true,
         totalPoints: true,
         level: true,
         profile_photo: true,
       },
     });
+
+    return users.map((user, index) => ({
+      rank: index + 1,
+      studentId: user.id,
+      studentName: user.full_name,
+      points: user.totalPoints,
+      level: user.level,
+      profile_photo: user.profile_photo,
+    }));
   }
 }

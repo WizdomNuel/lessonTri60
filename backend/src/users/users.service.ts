@@ -49,6 +49,9 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    return user;
+    return {
+      ...user,
+      points: user.totalPoints,
+    } as any;
   }
 }

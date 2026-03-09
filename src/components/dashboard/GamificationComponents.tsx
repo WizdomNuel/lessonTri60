@@ -110,15 +110,15 @@ export function Leaderboard({ entries = [] }: { entries?: LeaderboardEntry[] }) 
             
             <Avatar className="h-10 w-10 border-2 border-background ring-2 ring-border/50">
               <AvatarImage src={entry.profile_photo} />
-              <AvatarFallback>{entry.studentName[0]}</AvatarFallback>
+              <AvatarFallback>{(entry.studentName || 'U')[0]}</AvatarFallback>
             </Avatar>
             
             <div className="flex-1 min-w-0">
               <div className="font-medium truncate flex items-center gap-2">
-                {entry.studentName}
+                {entry.studentName || 'Unknown Student'}
                 {entry.studentId === user?.id && <Badge variant="outline" className="text-[10px] h-5 border-primary/30 text-primary">You</Badge>}
               </div>
-              <div className="text-xs text-muted-foreground font-mono">{entry.points.toLocaleString()} pts</div>
+              <div className="text-xs text-muted-foreground font-mono">{(entry.points || 0).toLocaleString()} pts</div>
             </div>
           </motion.div>
         )) : (

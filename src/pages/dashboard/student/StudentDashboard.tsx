@@ -6,10 +6,12 @@ import { BookOpen, Clock, Video, FileText, ArrowRight, Zap, Trophy, Target, Acti
 import { Link } from 'react-router-dom';
 import { PointsCounter, BadgeList, Leaderboard } from '@/components/dashboard/GamificationComponents';
 import { LearningPath } from '@/components/dashboard/LearningPath';
+import { useAuth } from '@/hooks/use-auth';
 import { api } from '@/lib/api-client';
 import { toast } from 'sonner';
 
 export function StudentDashboard() {
+  const { logout } = useAuth();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<{
     profile: any;
@@ -42,14 +44,19 @@ export function StudentDashboard() {
           schedule: [] // We'll add this later or mock for now
         });
       } catch (error: any) {
-        toast.error('Failed to load dashboard data');
+        if (error.status === 401) {
+          toast.error('Session expired. Please log in again.');
+          logout();
+        } else {
+          toast.error('Failed to load dashboard data');
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchDashboardData();
-  }, []);
+  }, [logout]);
 
   if (loading) {
     return (
@@ -60,7 +67,7 @@ export function StudentDashboard() {
   }
 
   const { profile, courses, leaderboard } = data;
-  const studentPoints = profile?.points || 0;
+  const studentPoints = profile?.totalPoints || 0;
 
   return (
     <div className="space-y-8">
