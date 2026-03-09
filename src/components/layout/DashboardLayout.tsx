@@ -7,21 +7,15 @@ import { Button } from '@/components/ui/button';
 import { Bell, Sun, Moon, Menu } from 'lucide-react';
 import { useTheme } from '@/components/theme-provider';
 
-// Mock user for now - in a real app this would come from AuthContext
-const MOCK_USER = {
-  name: 'Chioma Nwosu',
-  role: 'student' as UserRole,
-  avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Chioma',
-};
+import { useAuth } from '@/hooks/use-auth';
 
 interface DashboardLayoutProps {
   role?: UserRole; // Optional role override for dev/testing
 }
 
 export function DashboardLayout({ role }: DashboardLayoutProps) {
-  // In a real app, check auth state here
-  const user = MOCK_USER;
-  const currentRole = role || user.role;
+  const { user } = useAuth();
+  const currentRole = role || user?.role || 'student';
   const { theme, setTheme } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -72,12 +66,12 @@ export function DashboardLayout({ role }: DashboardLayoutProps) {
             
             <div className="flex items-center gap-4 border-l border-border/50 pl-4 lg:pl-6">
               <div className="text-right hidden sm:block">
-                <p className="text-sm font-bold leading-none">{user.name}</p>
+                <p className="text-sm font-bold leading-none">{user.full_name}</p>
                 <p className="text-xs text-muted-foreground capitalize mt-1">{currentRole}</p>
               </div>
               <Avatar className="h-8 w-8 lg:h-10 lg:w-10 ring-2 ring-primary/20 transition-all hover:ring-primary/50">
-                <AvatarImage src={user.avatar} />
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarImage src={user.profile_photo} />
+                <AvatarFallback>{user.full_name[0]}</AvatarFallback>
               </Avatar>
             </div>
           </div>

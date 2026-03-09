@@ -17,6 +17,7 @@ import {
   Zap,
   X,
 } from 'lucide-react';
+import { useAuth } from '@/hooks/use-auth';
 import { UserRole } from '@/types';
 import { Button } from '@/components/ui/button';
 
@@ -28,6 +29,7 @@ interface SidebarProps {
 
 export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
   const location = useLocation();
+  const { logout } = useAuth();
 
   const links = {
     student: [
@@ -131,6 +133,7 @@ export function Sidebar({ role, isOpen, onClose }: SidebarProps) {
             Settings
           </Link>
           <button
+            onClick={logout}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors"
           >
             <LogOut className="h-5 w-5" />

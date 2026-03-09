@@ -2,14 +2,46 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MOCK_COURSES } from '@/lib/mockData';
-import { Users, DollarSign, BookOpen, TrendingUp, Plus } from 'lucide-react';
+import { Users, DollarSign, BookOpen, TrendingUp, Plus, Trophy } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+import { useAuth } from '@/hooks/use-auth';
+import { motion } from 'framer-motion';
+
 export function TeacherDashboard() {
+  const { user } = useAuth();
   const myCourses = MOCK_COURSES.slice(0, 3);
 
   return (
     <div className="space-y-8">
+      {/* Welcome Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="glass-panel p-8 rounded-3xl relative overflow-hidden group"
+      >
+        <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-500">
+          <Trophy className="h-32 w-32 text-primary" />
+        </div>
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-2">
+              Welcome back, <span className="text-primary">{user?.full_name || 'Instructor'}!</span>
+            </h2>
+            <p className="text-muted-foreground text-lg font-medium">
+              You have {myCourses.length} active courses and 1,234 students.
+            </p>
+          </div>
+          <div className="flex gap-4">
+            <Link to="/dashboard/teacher/courses">
+              <Button size="lg" className="rounded-full px-8 bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20">
+                <Plus className="mr-2 h-5 w-5" /> New Course
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </motion.div>
+
       {/* Stats Overview */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>

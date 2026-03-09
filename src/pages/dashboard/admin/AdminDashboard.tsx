@@ -1,9 +1,33 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, BookOpen, DollarSign, AlertCircle } from 'lucide-react';
+import { Users, BookOpen, DollarSign, AlertCircle, Settings } from 'lucide-react';
+
+import { useAuth } from '@/hooks/use-auth';
+import { motion } from 'framer-motion';
 
 export function AdminDashboard() {
+  const { user } = useAuth();
+
   return (
     <div className="space-y-8">
+      {/* Welcome Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="glass-panel p-8 rounded-3xl relative overflow-hidden group"
+      >
+        <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-500">
+          <Settings className="h-32 w-32 text-primary" />
+        </div>
+        <div className="relative z-10">
+          <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-2">
+            Welcome back, <span className="text-primary">{user?.full_name || 'Administrator'}!</span>
+          </h2>
+          <p className="text-muted-foreground text-lg font-medium">
+            System health is normal. You have 12 pending approvals to review.
+          </p>
+        </div>
+      </motion.div>
+
       {/* Stats Overview */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
