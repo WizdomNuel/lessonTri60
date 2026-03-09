@@ -114,11 +114,11 @@ export const MOCK_BADGES: Achievement[] = [
 ];
 
 export const MOCK_LEADERBOARD: LeaderboardEntry[] = [
-  { rank: 1, studentId: 's1', studentName: 'Emeka Obi', points: 12500, avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emeka' },
-  { rank: 2, studentId: 's2', studentName: 'Aisha Bello', points: 11200, avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Aisha' },
-  { rank: 3, studentId: 's3', studentName: 'Tunde Bakare', points: 10800, avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Tunde' },
-  { rank: 4, studentId: 'u1', studentName: 'Chioma Nwosu', points: 9500, avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Chioma' }, // Current User
-  { rank: 5, studentId: 's5', studentName: 'Ngozi Eze', points: 9100, avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ngozi' },
+  { rank: 1, studentId: 's1', studentName: 'Emeka Obi', points: 12500, profile_photo: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emeka' },
+  { rank: 2, studentId: 's2', studentName: 'Aisha Bello', points: 11200, profile_photo: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Aisha' },
+  { rank: 3, studentId: 's3', studentName: 'Tunde Bakare', points: 10800, profile_photo: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Tunde' },
+  { rank: 4, studentId: 'u1', studentName: 'Chioma Nwosu', points: 9500, profile_photo: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Chioma' }, // Current User
+  { rank: 5, studentId: 's5', studentName: 'Ngozi Eze', points: 9100, profile_photo: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ngozi' },
 ];
 
 export const MOCK_LEARNING_PATH: LearningStep[] = [

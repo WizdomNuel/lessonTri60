@@ -13,7 +13,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, pass: string) => Promise<void>;
-  register: (data: any) => Promise<void>;
+  registerPhase: (phase: number, data: any) => Promise<void>;
   logout: () => void;
 }
 
@@ -51,13 +51,59 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(userData);
   };
 
-  const register = async (data: any) => {
-    const response = await api.post<{ access_token: string, user: User }>('/auth/register', data);
-    const { access_token, user: userData } = response;
-    
-    localStorage.setItem('lesson360_token', access_token);
-    setToken(access_token);
-    setUser(userData);
+  const registerPhase = async (phase: number, data: any) => {
+    let payload = {};
+
+    if (phase === 1) {
+      payload = {
+        full_name: `${data.firstName} ${data.lastName}`,
+        email: data.email,
+        password: data.password,
+        role: data.role
+      };
+      const response = await api.post<{ access_token: string, user: User }>('/auth/register/phase1', payload);
+      const { access_token, user: userData } = response;
+      localStorage.setItem('lesson360_token', access_token);
+      setToken(access_token);
+      setUser(userData);
+    } else if (phase === 2) {
+      if (data.role === 'STUDENT') {
+        payload = {
+          class_level: data.gradeLevel,
+          learning_goals: data.performance // Mapping loosely for now
+        };
+      } else {
+        payload = {
+          qualification: data.qualification,
+          years_of_experience: data.experienceYears,
+          bio: data.bio
+        };
+      }
+      const userData = await api.post<User>('/auth/register/phase2', payload);
+      setUser(userData);
+    } else if (phase === 3) {
+      if (data.role === 'STUDENT') {
+        payload = {
+          subjects_of_interest: data.subjectsToImprove,
+          skills_to_improve: [data.learningStyle],
+          challenge_level: data.primaryGoal
+        };
+      } else {
+        payload = {
+          subjects_of_interest: data.subjectsTaught,
+          skills_to_improve: [data.availability]
+        };
+      }
+      const userData = await api.post<User>('/auth/register/phase3', payload);
+      setUser(userData);
+    } else if (phase === 4) {
+      payload = {
+        bio: data.bio, // Syncing bio again if needed
+        profile_photo: user?.profile_photo // or whatever we have
+      };
+      const userData = await api.post<User>('/auth/register/phase4', payload);
+      setUser(userData);
+    }
   };
 
   const logout = () => {
@@ -73,7 +119,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAuthenticated: !!user, 
       isLoading,
       login, 
-      register, 
+      registerPhase, 
       logout 
     }}>
       {children}

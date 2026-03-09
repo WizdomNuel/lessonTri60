@@ -2,11 +2,10 @@ export type UserRole = 'STUDENT' | 'TEACHER' | 'ADMIN';
 
 export interface User {
   id: string;
-  firstName: string;
-  lastName: string;
+  full_name: string;
   email: string;
   role: UserRole;
-  avatarUrl?: string;
+  profile_photo?: string;
 }
 
 export interface Course {
@@ -51,7 +50,7 @@ export interface LeaderboardEntry {
   studentId: string;
   studentName: string;
   points: number;
-  avatarUrl: string;
+  profile_photo: string;
 }
 
 export interface LearningStep {

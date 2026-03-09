@@ -45,7 +45,7 @@ import { toast } from 'sonner';
 
 export function RegisterPage() {
   const navigate = useNavigate();
-  const { register, isAuthenticated, user } = useAuth();
+  const { registerPhase, isAuthenticated, user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -99,29 +99,27 @@ export function RegisterPage() {
     });
   };
 
-  const handleNext = () => {
-    if (currentStep < STEPS.length) {
-      setCurrentStep(prev => prev + 1);
-    } else {
-      handleSubmit();
+  const handleNext = async () => {
+    setIsSubmitting(true);
+    try {
+      await registerPhase(currentStep, formData);
+      if (currentStep < STEPS.length) {
+        setCurrentStep(prev => prev + 1);
+      } else {
+        toast.success('Account created successfully!');
+        const rolePath = formData.role.toLowerCase();
+        navigate(`/dashboard/${rolePath}`);
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Registration failed');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleBack = () => {
     if (currentStep > 1) {
       setCurrentStep(prev => prev - 1);
-    }
-  };
-
-  const handleSubmit = async () => {
-    setIsSubmitting(true);
-    try {
-      await register(formData);
-      toast.success('Account created successfully!');
-    } catch (error: any) {
-      toast.error(error.message || 'Registration failed');
-    } finally {
-      setIsSubmitting(false);
     }
   };
 

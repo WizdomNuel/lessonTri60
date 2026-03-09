@@ -109,7 +109,7 @@ export function Leaderboard({ entries = [] }: { entries?: LeaderboardEntry[] }) 
             </div>
             
             <Avatar className="h-10 w-10 border-2 border-background ring-2 ring-border/50">
-              <AvatarImage src={entry.avatarUrl} />
+              <AvatarImage src={entry.profile_photo} />
               <AvatarFallback>{entry.studentName[0]}</AvatarFallback>
             </Avatar>
             
