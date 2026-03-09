@@ -12,7 +12,7 @@ import { UpdateUserStatusDto, UpdateUserRoleDto } from './dto/admin.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
-import { Role } from '@prisma/client';
+import { Role } from '../prisma/generated-client';
 
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)

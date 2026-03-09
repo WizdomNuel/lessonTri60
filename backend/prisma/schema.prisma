@@ -8,6 +8,7 @@ generator client {
   provider      = "prisma-client-js"
   engineType    = "library"
   binaryTargets = ["native", "windows"]
+  output        = "../src/prisma/generated-client"
 }
 
 datasource db {

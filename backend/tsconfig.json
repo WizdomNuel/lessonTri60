@@ -19,7 +19,7 @@
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
     "paths": {
-      "@prisma/client": ["node_modules/.prisma/client/index"]
+      "@prisma/client": ["src/prisma/generated-client"]
     }
   }
 }
