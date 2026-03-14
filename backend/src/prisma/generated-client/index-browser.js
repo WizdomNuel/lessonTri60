@@ -170,16 +170,16 @@ exports.Prisma.PointTransactionScalarFieldEnum = {
 
 exports.Prisma.CourseScalarFieldEnum = {
   id: 'id',
+  teacher_id: 'teacher_id',
   title: 'title',
   description: 'description',
   thumbnail: 'thumbnail',
   price: 'price',
   level: 'level',
   subject: 'subject',
-  isPublished: 'isPublished',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  teacherId: 'teacherId'
+  status: 'status',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
 };
 
 exports.Prisma.ModuleScalarFieldEnum = {
@@ -194,13 +194,13 @@ exports.Prisma.ModuleScalarFieldEnum = {
 
 exports.Prisma.LessonScalarFieldEnum = {
   id: 'id',
+  course_id: 'course_id',
   title: 'title',
   content: 'content',
-  videoUrl: 'videoUrl',
-  orderIndex: 'orderIndex',
-  isPublished: 'isPublished',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
+  video_url: 'video_url',
+  lesson_order: 'lesson_order',
+  created_at: 'created_at',
+  updated_at: 'updated_at',
   moduleId: 'moduleId'
 };
 
@@ -216,11 +216,19 @@ exports.Prisma.QuizScalarFieldEnum = {
 
 exports.Prisma.EnrollmentScalarFieldEnum = {
   id: 'id',
-  progress: 'progress',
-  enrolledAt: 'enrolledAt',
-  lastAccessAt: 'lastAccessAt',
-  userId: 'userId',
-  courseId: 'courseId'
+  student_id: 'student_id',
+  course_id: 'course_id',
+  progress_percentage: 'progress_percentage',
+  completed: 'completed',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
+exports.Prisma.LessonCompletionScalarFieldEnum = {
+  id: 'id',
+  student_id: 'student_id',
+  lesson_id: 'lesson_id',
+  completed_at: 'completed_at'
 };
 
 exports.Prisma.PaymentScalarFieldEnum = {
@@ -323,6 +331,11 @@ exports.Role = exports.$Enums.Role = {
   ADMIN: 'ADMIN'
 };
 
+exports.CourseStatus = exports.$Enums.CourseStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED'
+};
+
 exports.PaymentStatus = exports.$Enums.PaymentStatus = {
   PENDING: 'PENDING',
   COMPLETED: 'COMPLETED',
@@ -339,6 +352,7 @@ exports.Prisma.ModelName = {
   Lesson: 'Lesson',
   Quiz: 'Quiz',
   Enrollment: 'Enrollment',
+  LessonCompletion: 'LessonCompletion',
   Payment: 'Payment',
   Assignment: 'Assignment',
   Submission: 'Submission',

@@ -21,6 +21,11 @@ enum Role {
   ADMIN
 }
 
+enum CourseStatus {
+  PENDING
+  APPROVED
+}
+
 model User {
   id              String   @id @default(uuid())
   email           String   @unique
@@ -44,6 +49,7 @@ model User {
   achievements   Achievement[]
   pointHistory   PointTransaction[]
   liveClasses    LiveClass[]        @relation("LiveClassTeacher")
+  lessonCompletions LessonCompletion[]
 
   // Phase 2: Academic information
   // For students:
@@ -93,24 +99,24 @@ model PointTransaction {
 }
 
 model Course {
-  id          String   @id @default(uuid())
+  id          String       @id @default(uuid())
+  teacher_id  String
+  teacher     User         @relation("TeacherCourses", fields: [teacher_id], references: [id])
   title       String
   description String
   thumbnail   String?
   price       Float
-  level       String // e.g., "JSS", "SSS", "Primary"
+  level       String
   subject     String
-  isPublished Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  status      CourseStatus @default(PENDING)
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
 
-  teacherId String
-  teacher   User   @relation("TeacherCourses", fields: [teacherId], references: [id])
-
-  modules          Module[]
+  lessons          Lesson[]
   enrollments      Enrollment[]
   liveClasses      LiveClass[]
   learningPathItem LearningPathItem[]
+  modules          Module[]
 }
 
 model Module {
@@ -128,20 +134,21 @@ model Module {
 }
 
 model Lesson {
-  id          String   @id @default(uuid())
-  title       String
-  content     String? // Text or markdown content
-  videoUrl    String?
-  orderIndex  Int
-  isPublished Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(uuid())
+  course_id    String
+  course       Course   @relation(fields: [course_id], references: [id], onDelete: Cascade)
+  title        String
+  content      String?
+  video_url    String?
+  lesson_order Int
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
 
-  moduleId String
-  module   Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-
+  completions LessonCompletion[]
   quizzes     Quiz[]
   assignments Assignment[]
+  moduleId    String?
+  module      Module?            @relation(fields: [moduleId], references: [id])
 }
 
 model Quiz {
@@ -157,18 +164,28 @@ model Quiz {
 }
 
 model Enrollment {
+  id                  String   @id @default(uuid())
+  student_id          String
+  student             User     @relation(fields: [student_id], references: [id], onDelete: Cascade)
+  course_id           String
+  course              Course   @relation(fields: [course_id], references: [id], onDelete: Cascade)
+  progress_percentage Float    @default(0)
+  completed           Boolean  @default(false)
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  @@unique([student_id, course_id])
+}
+
+model LessonCompletion {
   id           String   @id @default(uuid())
-  progress     Float    @default(0)
-  enrolledAt   DateTime @default(now())
-  lastAccessAt DateTime @default(now())
+  student_id   String
+  student      User     @relation(fields: [student_id], references: [id], onDelete: Cascade)
+  lesson_id    String
+  lesson       Lesson   @relation(fields: [lesson_id], references: [id], onDelete: Cascade)
+  completed_at DateTime @default(now())
 
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  courseId String
-  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, courseId])
+  @@unique([student_id, lesson_id])
 }
 
 enum PaymentStatus {
